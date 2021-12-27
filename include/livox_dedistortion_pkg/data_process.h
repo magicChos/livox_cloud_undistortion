@@ -45,6 +45,13 @@ public:
      */
     void UndistortPcl(const PointCloudXYZI::Ptr &pcl_in_out, double dt_be,
                       const Sophus::SE3d &Tbe);
+    
+    /**
+     * @brief 设置lidar和imu之间的外参
+     * 
+     * @param q 
+     * @param t 
+     */
     void set_T_i_l(Eigen::Quaterniond &q, Eigen::Vector3d &t)
     {
         T_i_l = Sophus::SE3d(q, t);
@@ -65,7 +72,6 @@ private:
     // 记录当前帧和上一帧lidar数据时间间隔
     double dt_l_c_;
 
-    /// Transform form lidar to imu
     // lidar到imu的变换矩阵(外参)
     Sophus::SE3d T_i_l;
     //// For timestamp usage

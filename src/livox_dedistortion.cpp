@@ -19,10 +19,11 @@ std::condition_variable sig_buffer;
 bool b_exit = false;
 bool b_reset = false;
 
-/// Buffers for measurements
+/// 上一帧lidar数据的时间戳
 double last_timestamp_lidar = -1;
 // 双端队列缓存lidar数据
 std::deque<sensor_msgs::PointCloud2::ConstPtr> lidar_buffer;
+// 上一帧imu数据的时间戳
 double last_timestamp_imu = -1;
 std::deque<sensor_msgs::Imu::ConstPtr> imu_buffer;
 
@@ -74,6 +75,13 @@ void imu_cbk(const sensor_msgs::Imu::ConstPtr &msg_in)
     sig_buffer.notify_all();
 }
 
+/**
+ * @brief 获得lidar和imu同步数据
+ * 
+ * @param measgroup[out] 
+ * @return true 
+ * @return false 
+ */
 bool SyncMeasure(MeasureGroup &measgroup)
 {
     if (lidar_buffer.empty() || imu_buffer.empty())
@@ -127,6 +135,7 @@ void ProcessLoop(std::shared_ptr<ImuProcess> p_imu)
     ros::Rate r(1000);
     while (ros::ok())
     {
+        // imu和lidar对齐的数据
         MeasureGroup meas;
         std::unique_lock<std::mutex> lk(mtx_buffer);
         sig_buffer.wait(lk, [&meas]() -> bool
@@ -164,7 +173,8 @@ int main(int argc, char **argv)
 
     std::vector<double> vec;
     if (nh.getParam("/ExtIL", vec))
-    {
+    {   
+        // lidar和imu外参
         Eigen::Quaternion<double> q_il;
         Eigen::Vector3d t_il;
         q_il.w() = vec[0];
