@@ -28,13 +28,15 @@ public:
 private:
     // Sophus::SO3d r_;
     /// last_imu_ is
+
     // 记录的是lidar数据的时间戳
     double start_timestamp_;
-    // lidar数据前一时刻的时间戳
+
     sensor_msgs::ImuConstPtr last_imu_;
     /// Making sure the equal size: v_imu_ and v_rot_
     //  记录内插出的imu数据
     std::vector<sensor_msgs::ImuConstPtr> v_imu_;
+    // 记录imu的积分结果（旋转变换）
     std::vector<Sophus::SO3d> v_rot_;
 };
 

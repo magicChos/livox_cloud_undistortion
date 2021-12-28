@@ -48,9 +48,13 @@ void GyrInt::Integrate(const sensor_msgs::ImuConstPtr &imu)
         double w1 = dt2 / (dt1 + dt2 + 1e-9);
         double w2 = dt1 / (dt1 + dt2 + 1e-9);
 
+        // 上一帧imu角速度
         const auto &gyr1 = last_imu_->angular_velocity;
+        // 上一帧imu加速度
         const auto &acc1 = last_imu_->linear_acceleration;
+        // 当前帧imu角速度
         const auto &gyr2 = imu->angular_velocity;
+        // 当前帧imu加速度
         const auto &acc2 = imu->linear_acceleration;
 
         imu_inter->header.stamp.fromSec(start_timestamp_);
@@ -83,6 +87,7 @@ void GyrInt::Integrate(const sensor_msgs::ImuConstPtr &imu)
     assert(time >= 0);
     double dt = time - time_last;
     auto delta_angle = dt * 0.5 * (gyr + gyr_last);
+    // 两帧imu之间的相对变换
     auto delta_r = SO3d::exp(delta_angle);
 
     // 当前帧和上一帧imu时间的变换矩阵

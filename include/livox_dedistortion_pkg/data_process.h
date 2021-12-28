@@ -37,7 +37,7 @@ public:
     void IntegrateGyr(const std::vector<sensor_msgs::Imu::ConstPtr> &v_imu);
 
     /**
-     * @brief 
+     * @brief 执行运动补偿，将当前点变换到结束帧时刻坐标系下
      * 
      * @param pcl_in_out 
      * @param dt_be 当前帧点云和上一帧点云的时间间隔
@@ -63,10 +63,9 @@ private:
     /// Whether is the first frame, init for first frame
     bool b_first_frame_ = true;
 
-    //// Input pointcloud
     // 当前帧lidar数据，转为pcl格式
     PointCloudXYZI::Ptr cur_pcl_in_;
-    //// Undistorted pointcloud
+    // 记录畸变校正后的点云
     PointCloudXYZI::Ptr cur_pcl_un_;
 
     // 记录当前帧和上一帧lidar数据时间间隔
@@ -78,6 +77,7 @@ private:
 
     // 记录上一帧lidar数据
     sensor_msgs::PointCloud2ConstPtr last_lidar_;
+    // 记录上一帧imu数据
     sensor_msgs::ImuConstPtr last_imu_;
 
     /// For gyroscope integration

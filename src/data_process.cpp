@@ -73,17 +73,17 @@ void ImuProcess::UndistortPcl(const PointCloudXYZI::Ptr &pcl_in_out,
         double ratio_ie = 1 - ratio_bi;
 
         Eigen::Vector3d rso3_ie = ratio_ie * rso3_be;
-        // 当前帧到结束帧的变换量
+        // 结束帧到当前得变换矩阵
         SO3d Rie = SO3d::exp(rso3_ie);
 
         /// Transform to the 'end' frame, using only the rotation
         /// Note: Compensation direction is INVERSE of Frame's moving direction
         /// So if we want to compensate a point at timestamp-i to the frame-e
         /// P_compensate = R_ei * Pi + t_ei
-        // 当前帧到结束帧的平移量
-        Eigen::Vector3d tie = ratio_ie * tbe;
-        // Eigen::Vector3d tei = Eigen::Vector3d::Zero();
 
+        // 结束帧和当前帧的平移量
+        Eigen::Vector3d tie = ratio_ie * tbe;
+        // 当前点坐标
         Eigen::Vector3d v_pt_i(pt.x, pt.y, pt.z);
         // v_pt_i = Rie * v_pt_comp_e + tie
         Eigen::Vector3d v_pt_comp_e = Rie.inverse() * (v_pt_i - tie);
@@ -125,11 +125,11 @@ void ImuProcess::Process(const MeasureGroup &meas)
         return;
     }
 
-    /// Integrate all input imu message
+    // 积分所有的imu消息
     IntegrateGyr(meas.imu);
 
-    /// Compensate lidar points with IMU rotation
-    //// Initial pose from IMU (with only rotation)
+    // 利用imu旋转补偿lidar点
+    // 来自imu的初始位姿
 
     // imu当前帧到上一帧imu之间的变换矩阵
     SE3d T_l_c(gyr_int_.GetRot(), Eigen::Vector3d::Zero());
